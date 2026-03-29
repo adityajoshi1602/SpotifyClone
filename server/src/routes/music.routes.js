@@ -1,12 +1,19 @@
 const express = require('express')
-const musiccontrollers= require('../controllers/music.controller')
+const musiccontrollers = require('../controllers/music.controller')
+const authamiddleware = require('../middlewares/auth.middleware')
 const multer = require('multer')
 const router = express()
 
 const upload = multer({
-    storage:multer.memoryStorage()
+    storage: multer.memoryStorage()
 })
 
-router.post('/upload',upload.single("music"),musiccontrollers.createmusic)
+router.post('/upload', authamiddleware.authartist, upload.single("music"), musiccontrollers.createmusic)
+router.post('/album', authamiddleware.authartist, musiccontrollers.albumcreate)
 
-module.exports=router
+router.get('/', authamiddleware.authuser, musiccontrollers.getallmusic)
+router.get('/album', authamiddleware.authuser, musiccontrollers.getallalbum)
+
+router.get('/album/:albumid', authamiddleware.authuser, musiccontrollers.getalbumbyid)
+
+module.exports = router
